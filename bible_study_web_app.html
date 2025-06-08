@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bible Study App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background: #6200ea;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    #searchBox {
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #searchBox input {
+      padding: 0.5rem;
+      width: 300px;
+      margin-right: 1rem;
+    }
+    #results {
+      padding: 1rem;
+    }
+    .verse {
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bible Study App</h1>
+    <p>Search the Bible, read devotionals, and more!</p>
+  </header>
+
+  <section id="searchBox">
+    <input type="text" id="searchInput" placeholder="Search for a word or phrase..." />
+    <button onclick="searchBible()">Search</button>
+  </section>
+
+  <section id="results">
+    <p>Type something to begin searching the Bible.</p>
+  </section>
+
+  <script>
+    let bibleText = {};
+
+    fetch('https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json')
+      .then(res => res.json())
+      .then(data => bibleText = data);
+
+    function searchBible() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      if (!query) {
+        resultsDiv.innerHTML = '<p>Please enter a search term.</p>';
+        return;
+      }
+
+      const results = [];
+
+      for (let book in bibleText) {
+        for (let chapter in bibleText[book]) {
+          for (let verse in bibleText[book][chapter]) {
+            const text = bibleText[book][chapter][verse].toLowerCase();
+            if (text.includes(query)) {
+              results.push(`<div class="verse"><strong>${book} ${chapter}:${verse}</strong> - ${bibleText[book][chapter][verse]}</div>`);
+            }
+          }
+        }
+      }
+
+      if (results.length === 0) {
+        resultsDiv.innerHTML = '<p>No results found.</p>';
+      } else {
+        resultsDiv.innerHTML = results.join('');
+      }
+    }
+  </script>
+</body>
+</html>
